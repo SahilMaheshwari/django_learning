@@ -6,7 +6,7 @@ from .models import Profile
 class UserRegisterForm(UserCreationForm):
     email = forms.EmailField(required=False)
     is_seller = forms.BooleanField(required=False)
-    cash = forms.IntegerField()
+    cash = forms.DecimalField(max_digits=10, decimal_places=2)
 
     class Meta:
         model = User

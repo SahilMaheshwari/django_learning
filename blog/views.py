@@ -44,3 +44,6 @@ class PostCreateView(CreateView):
 
 def about(request):
     return render(request, 'blog/about.html', {'title' : 'About'})
+
+def addmoney(request):
+    return render(request, 'blog/addmoney.html', {'title' : 'Add Money'})

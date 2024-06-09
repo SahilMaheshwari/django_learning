@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from registration import views as registration_views
+from blog import views as blog_views
 from django.contrib.auth import views as auth_views
 from django.views.generic import TemplateView
 
@@ -29,7 +30,8 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('logout/',registration_views.user_logout,name='logout'),
     path('admin/', admin.site.urls),
-    path('', include('blog.urls'))
+    path('', include('blog.urls')),
+    path('addmoney/', blog_views.addmoney,name='addmoney')
 ]
 
 if settings.DEBUG:
