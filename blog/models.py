@@ -5,7 +5,7 @@ from django.urls import reverse
 
 class post(models.Model):
     title = models.CharField(max_length=100)
-    content = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateTimeField(default = timezone.now)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='images')
