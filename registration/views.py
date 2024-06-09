@@ -4,6 +4,7 @@ from django.contrib import messages
 from .forms import UserRegisterForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from blog.models import post
 
 def register(request):
     if request.method == 'POST':
@@ -25,3 +26,6 @@ def user_logout(request):
 @login_required
 def profile(request):
     return render(request, 'registration/profile.html')
+
+
+

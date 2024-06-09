@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.urls import reverse
+from registration.models import User
 
 class post(models.Model):
     title = models.CharField(max_length=100)
@@ -15,3 +16,12 @@ class post(models.Model):
 
     def get_absolute_url(self):
         return reverse('post-detail', kwargs={'pk' : self.pk})
+
+class Cart(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    is_paid = models.BooleanField(default=False)
+
+class CartItems(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    product = models.ForeignKey(post, on_delete=models.SET_NULL, null=True, blank=True)
+   

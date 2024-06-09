@@ -12,7 +12,7 @@
             <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
             <p class="article-content">${{ post.price }}</p>
             <img class="article-img" src="{{ post.image.url }}" alt="{{ post.title }}">
-            <a class="nav-item nav-link" href="#">Add to cart</a>
+            <a class="nav-item nav-link" href="{% url 'add_to_cart' post.id%}">Add to cart</a>
             <a class="nav-item nav-link" href="#">View More</a>
           </div>
         </article>

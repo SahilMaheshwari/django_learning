@@ -1,10 +1,11 @@
 from django.forms.models import BaseModelForm
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import post
+from .models import post, Cart, CartItems
 from django.views.generic import ListView, DetailView, CreateView
-from django.shortcuts import redirect  
-from .models import post  
+from django.shortcuts import redirect   
+from django.http import HttpResponseRedirect
+
 
 def home(request):
     context = {
@@ -47,3 +48,12 @@ def about(request):
 
 def addmoney(request):
     return render(request, 'blog/addmoney.html', {'title' : 'Add Money'})
+
+def add_to_cart(request, id):
+    product = post.objects.get(id=id)
+    user = request.user
+    cart , _ = Cart.objects.get_or_create(user = user, is_paid = False)
+
+    cart_items = CartItems.objects.create(cart = cart, product = product)
+
+    return HttpResponseRedirect(request.path_info)
