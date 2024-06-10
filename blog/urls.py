@@ -7,6 +7,6 @@ urlpatterns = [
     path('post/<int:pk>/', PostDetailView.as_view(), name = 'post-detail'),
     path('post/new/', PostCreateView.as_view(), name = 'post-create'),
     path('about/', views.about, name = 'blog-about'),
-    path('add-to-cart/<id>/', add_to_cart, name="add_to_cart")
+    path('add-to-cart/<int:id>/', add_to_cart, name="add_to_cart")
 ]
   

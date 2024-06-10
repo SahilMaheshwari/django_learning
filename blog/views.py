@@ -50,10 +50,17 @@ def addmoney(request):
     return render(request, 'blog/addmoney.html', {'title' : 'Add Money'})
 
 def add_to_cart(request, id):
+    print("penis")
     product = post.objects.get(id=id)
     user = request.user
-    cart , _ = Cart.objects.get_or_create(user = user, is_paid = False)
+    cart, created = Cart.objects.get_or_create(user = user, is_paid = False)
+    if created:
+        print("Created a new cart for the user")
+    else:
+        print("Existing cart found for the user")
 
     cart_items = CartItems.objects.create(cart = cart, product = product)
+    print(f"Added {product} to cart {cart}")
 
-    return HttpResponseRedirect(request.path_info)
+
+    return HttpResponseRedirect('/')
