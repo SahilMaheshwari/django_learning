@@ -21,6 +21,11 @@ class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     is_paid = models.BooleanField(default=False)
 
+    def total_price(self):
+        cart_items = self.cartitems_set.all()
+        cartPrice = sum(i.product.price for i in cart_items)
+        return cartPrice
+
 class CartItems(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.ForeignKey(post, on_delete=models.SET_NULL, null=True, blank=True)

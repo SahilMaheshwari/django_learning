@@ -5,6 +5,8 @@ from .models import post, Cart, CartItems
 from django.views.generic import ListView, DetailView, CreateView
 from django.shortcuts import redirect   
 from django.http import HttpResponseRedirect
+#from .forms import UserAddMoney
+from django.contrib import messages
 
 
 def home(request):
@@ -46,11 +48,19 @@ class PostCreateView(CreateView):
 def about(request):
     return render(request, 'blog/about.html', {'title' : 'About'})
 
-def addmoney(request):
-    return render(request, 'blog/addmoney.html', {'title' : 'Add Money'})
+# def addmoney(request):
+#     if request.method == 'POST':
+#         form = UserAddMoney(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             username = form.cleaned_data.get('username')
+#             messages.success(request, f'Account created for {username}!')
+#             return redirect('profile')
+#         else:
+#             form = UserAddMoney()
+#     return render(request, 'blog/addmoney.html', {'title' : 'Add Money'})
 
 def add_to_cart(request, id):
-    print("penis")
     product = post.objects.get(id=id)
     user = request.user
     cart, created = Cart.objects.get_or_create(user = user, is_paid = False)
@@ -61,6 +71,17 @@ def add_to_cart(request, id):
 
     cart_items = CartItems.objects.create(cart = cart, product = product)
     print(f"Added {product} to cart {cart}")
-
-
     return HttpResponseRedirect('/')
+
+def cart(request):
+    cart = Cart.objects.filter(is_paid = False, user = request.user)[0]
+    cart_items = cart.cartitems_set.all()
+    products = [i.product for i in cart_items]
+
+    context = {
+        'cart': cart,
+        'cart_items': cart_items,  # Use the related_name 'items'
+        'products': products
+    }
+
+    return render(request, 'blog/cart.html', context)

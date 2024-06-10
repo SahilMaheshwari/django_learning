@@ -30,8 +30,8 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('logout/',registration_views.user_logout,name='logout'),
     path('admin/', admin.site.urls),
-    path('', include('blog.urls')),
-    path('addmoney/', blog_views.addmoney,name='addmoney')
+    path('', include('blog.urls'))
+    #path('addmoney/', blog_views.addmoney,name='addmoney')
 ]
 
 if settings.DEBUG:
