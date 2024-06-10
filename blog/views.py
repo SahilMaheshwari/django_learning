@@ -7,26 +7,27 @@ from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
 #from .forms import UserAddMoney
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 
-def home(request):
-    context = {
-        'posts' : post.objects.all()
-        }
-    return render(request, 'blog/home.html', context)
-    if request.method == 'POST':  
-        form = UserImage(request.POST, request.FILES)  
-        if form.is_valid():  
-            form.save()  
+# def home(request):
+#     context = {
+#         'posts' : post.objects.all()
+#         }
+#     return render(request, 'blog/home.html', context)
+#     if request.method == 'POST':  
+#         form = UserImage(request.POST, request.FILES)  
+#         if form.is_valid():  
+#             form.save()  
   
-            # Getting the current instance object to display in the template  
-            img_object = form.instance  
+#             # Getting the current instance object to display in the template  
+#             img_object = form.instance  
               
-            return render(request, 'blog/post_form.html', {'form': form, 'img_obj': img_object})  
-    else:  
-        form = UserImage()  
+#             return render(request, 'blog/post_form.html', {'form': form, 'img_obj': img_object})  
+#     else:  
+#         form = UserImage()  
   
-    return render(request, 'blog/post_form.html', {'form': form})  
+#     return render(request, 'blog/post_form.html', {'form': form})  
 
 class PostListView(ListView):
     model = post
@@ -48,18 +49,6 @@ class PostCreateView(CreateView):
 def about(request):
     return render(request, 'blog/about.html', {'title' : 'About'})
 
-# def addmoney(request):
-#     if request.method == 'POST':
-#         form = UserAddMoney(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             username = form.cleaned_data.get('username')
-#             messages.success(request, f'Account created for {username}!')
-#             return redirect('profile')
-#         else:
-#             form = UserAddMoney()
-#     return render(request, 'blog/addmoney.html', {'title' : 'Add Money'})
-
 def add_to_cart(request, id):
     product = post.objects.get(id=id)
     user = request.user
@@ -69,10 +58,18 @@ def add_to_cart(request, id):
     else:
         print("Existing cart found for the user")
 
-    cart_items = CartItems.objects.create(cart = cart, product = product)
-    print(f"Added {product} to cart {cart}")
+    cart_item, created = CartItems.objects.get_or_create(cart=cart, product=product)
+    if created:
+        cart_item.count = 1
+        cart_item.save()
+        print(f"Added {product} to cart {cart}")
+    else:
+        cart_item.count += 1
+        cart_item.save()
+        print(f"Updated {product} count in cart {cart}")
     return HttpResponseRedirect('/')
 
+@login_required
 def cart(request):
     cart = Cart.objects.filter(is_paid = False, user = request.user)[0]
     cart_items = cart.cartitems_set.all()

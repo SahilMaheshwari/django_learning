@@ -23,10 +23,11 @@ class Cart(models.Model):
 
     def total_price(self):
         cart_items = self.cartitems_set.all()
-        cartPrice = sum(i.product.price for i in cart_items)
+        cartPrice = sum(i.product.price*i.count for i in cart_items)
         return cartPrice
 
 class CartItems(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.ForeignKey(post, on_delete=models.SET_NULL, null=True, blank=True)
+    count = models.IntegerField(default=0)
    
