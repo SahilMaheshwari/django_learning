@@ -12,6 +12,7 @@ class post(models.Model):
     image = models.ImageField(upload_to='images')
     orders = models.IntegerField(default=0)
     stock = models.IntegerField(default=0)
+    description = models.CharField(max_length=200, default='No description given')
 
     def __str__(self):
         return self.title

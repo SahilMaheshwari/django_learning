@@ -2,7 +2,7 @@
 {% block content %}
     {% for order in orders %}
     <article class="media content-section">
-        <h2><a class="article-title" href="#">order {{ order.id }}</a></h2>
+        <h2><a class="article-title" href="#">order {{ forloop.counter }}</a></h2>
         {% for post in order.cartitems_set.all %}
         <article class="media content-section">
         <img class="rounded-circle article-img" src="{{ post.product.author.profile.image.url }}">
@@ -18,7 +18,7 @@
             <img class="article-img" src="{{ post.product.image.url }}" alt="{{ post.product.title }}">
         </div>
         </article>
-    {% endfor %}
+        {% endfor %}
     </article>
     {% endfor %}
 {% endblock content %}

@@ -41,7 +41,7 @@ class PostDetailView(DetailView):
 
 class PostCreateView(CreateView):
     model = post
-    fields = ['title', 'price', 'image', 'stock']
+    fields = ['title', 'price', 'image', 'description', 'stock']
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -124,11 +124,12 @@ def placeorder(request):
 
 @login_required
 def sellerhome(request):
-    return render(request, 'blog/sellerhome.html')
+    posts = post.objects.filter(author = request.user)
+    return render(request, 'blog/sellerhome.html', {'posts' : posts})
 
 @login_required
 def orderhistory(request):
     user = request.user
-    orders = Cart.objects.filter(is_paid=True, user=user)
+    orders = Cart.objects.filter(is_paid=True, user=user).order_by('-id')
 
     return render(request, 'blog/orderhistory.html', {'orders' : orders})

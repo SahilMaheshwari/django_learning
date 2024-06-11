@@ -13,6 +13,8 @@
             <p class="article-content">${{ post.price }}</p>
             <p class="article-content">stock {{ post.stock }}</p>
             <img class="article-img" src="{{ post.image.url }}" alt="{{ post.title }}">
+            <p class="article-content">Description:
+               {{ post.description }}</p>
             <a class="nav-item nav-link" href="{% url 'add_to_cart' post.id%}">Add to cart</a>
             <a class="nav-item nav-link" href="#">View More</a>
           </div>
