@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import Profile
 
 class UserRegisterForm(UserCreationForm):
-    email = forms.EmailField(required=False)
+    email = forms.EmailField(required=True)
     is_seller = forms.BooleanField(required=False)
     cash = forms.DecimalField(max_digits=10, decimal_places=2)
 

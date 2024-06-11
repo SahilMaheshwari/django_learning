@@ -9,6 +9,7 @@ from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from registration.models import Profile
+from .mailer import sendDaMail
 
 
 # def home(request):
@@ -110,6 +111,7 @@ def placeorder(request):
                         products.product.stock -= products.quantity
                         products.product.orders += products.quantity
                         products.product.save()
+                        sendDaMail(products.product.author.email, products.product.author.username)
 
                     return render(request, 'blog/orderplaced.html')
                 else:
