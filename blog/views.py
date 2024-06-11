@@ -115,10 +115,10 @@ def placeorder(request):
 
                     return render(request, 'blog/orderplaced.html')
                 else:
-                    return render(request, 'blog/addmoney.html')
+                    return render(request, 'blog/sorry.html', {'sorrytext' : "Not enough money in account"})
             else:
                 cart.delete()
-                return render(request, 'blog/sorry.html')
+                return render(request, 'blog/sorry.html', {'sorrytext' : "Sorry, please order quantity in stock"})
         else:
             return redirect('cart')  # If no cart found, redirect to the cart page
 
