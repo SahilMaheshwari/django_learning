@@ -39,7 +39,8 @@
                     {%if user.profile.is_seller %}
                       <a class="nav-item nav-link" href="{% url 'post-create' %}">Upload Product</a>                     -->
                     {% endif %}
-                    <a class="nav-item nav-link" href="{% url 'profile' %}">Profile</a>
+                    <a class="nav-item nav-link" href="{% url 'orderhistory' %}">View order history</a>  
+                    <a class="nav-item nav-link" href="{% url 'profile' %}">Add money</a>
                     <a class="nav-item nav-link" href="{% url 'logout' %}">Logout</a>
                     <a class="nav-item nav-link" href="{% url 'profile' %}"> {{ user.profile.cash }} $</a>
                 {% else %}

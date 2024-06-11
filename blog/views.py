@@ -8,6 +8,7 @@ from django.http import HttpResponseRedirect
 #from .forms import UserAddMoney
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from registration.models import Profile
 
 
 # def home(request):
@@ -33,14 +34,14 @@ class PostListView(ListView):
     model = post
     template_name = 'blog/home.html'
     context_object_name = 'posts'
-    ordering = ['-date']
+    ordering = ['-orders']
 
 class PostDetailView(DetailView):
     model = post
 
 class PostCreateView(CreateView):
     model = post
-    fields = ['title', 'price', 'image']
+    fields = ['title', 'price', 'image', 'stock']
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -49,6 +50,7 @@ class PostCreateView(CreateView):
 def about(request):
     return render(request, 'blog/about.html', {'title' : 'About'})
 
+@login_required
 def add_to_cart(request, id):
     product = post.objects.get(id=id)
     user = request.user
@@ -60,18 +62,18 @@ def add_to_cart(request, id):
 
     cart_item, created = CartItems.objects.get_or_create(cart=cart, product=product)
     if created:
-        cart_item.count = 1
+        cart_item.quantity = 1
         cart_item.save()
         print(f"Added {product} to cart {cart}")
     else:
-        cart_item.count += 1
+        cart_item.quantity += 1
         cart_item.save()
-        print(f"Updated {product} count in cart {cart}")
+        print(f"Updated {product} quantity in cart {cart}")
     return HttpResponseRedirect('/')
 
 @login_required
 def cart(request):
-    cart = Cart.objects.filter(is_paid = False, user = request.user)[0]
+    cart, created = Cart.objects.get_or_create(user = request.user, is_paid = False)
     cart_items = cart.cartitems_set.all()
     products = [i.product for i in cart_items]
 
@@ -82,3 +84,51 @@ def cart(request):
     }
 
     return render(request, 'blog/cart.html', context)
+
+@login_required
+def placeorder(request):
+    if request.method == 'POST':
+        user = request.user
+        cart = Cart.objects.filter(is_paid=False, user=user).first()
+        profile = Profile.objects.filter(user=user).first()
+        cart_items = cart.cartitems_set.all()
+        stockenough = True
+
+        for products in cart_items:
+            if products.product.stock < products.quantity:
+                stockenough = False
+
+        if cart:
+            if stockenough :
+                if profile.cash > cart.total_price():
+                    cart.is_paid = True
+                    cart.save()
+                    profile.cash = profile.cash - cart.total_price()
+                    profile.save()
+
+                    for products in cart_items:
+                        products.product.stock -= products.quantity
+                        products.product.orders += products.quantity
+                        products.product.save()
+
+                    return render(request, 'blog/orderplaced.html')
+                else:
+                    return render(request, 'blog/addmoney.html')
+            else:
+                cart.delete()
+                return render(request, 'blog/sorry.html')
+        else:
+            return redirect('cart')  # If no cart found, redirect to the cart page
+
+    return redirect('cart')  # Redirect to cart if the request method is not POST
+
+@login_required
+def sellerhome(request):
+    return render(request, 'blog/sellerhome.html')
+
+@login_required
+def orderhistory(request):
+    user = request.user
+    orders = Cart.objects.filter(is_paid=True, user=user)
+
+    return render(request, 'blog/orderhistory.html', {'orders' : orders})

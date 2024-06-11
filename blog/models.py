@@ -10,6 +10,8 @@ class post(models.Model):
     date = models.DateTimeField(default = timezone.now)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='images')
+    orders = models.IntegerField(default=0)
+    stock = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title
@@ -23,11 +25,12 @@ class Cart(models.Model):
 
     def total_price(self):
         cart_items = self.cartitems_set.all()
-        cartPrice = sum(i.product.price*i.count for i in cart_items)
+        cartPrice = sum(i.product.price*i.quantity for i in cart_items)
         return cartPrice
 
 class CartItems(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.ForeignKey(post, on_delete=models.SET_NULL, null=True, blank=True)
-    count = models.IntegerField(default=0)
+    quantity = models.IntegerField(default=0)
+
    
