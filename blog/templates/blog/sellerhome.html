@@ -21,4 +21,8 @@
           </div>
         </article>
     {% endfor %}
+    <form method="post" action="{% url 'generatereport' %}">
+      {% csrf_token %}
+      <button type="submit">Generate Report</button>
+    </form>
 {% endblock content %}

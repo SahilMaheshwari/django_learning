@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from registration.models import Profile
 from .mailer import sendDaMail
+import csv
 
 
 # def home(request):
@@ -135,3 +136,18 @@ def orderhistory(request):
     orders = Cart.objects.filter(is_paid=True, user=user).order_by('-id')
 
     return render(request, 'blog/orderhistory.html', {'orders' : orders})
+
+@login_required
+def generate_report(request):
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=report.csv'
+
+    writer = csv.writer(response)
+    posts = post.objects.filter(author = request.user)
+    writer.writerow(['Name', 'Cost/Unit', 'Orders', 'Inventory'])
+
+    for i in posts:
+        writer.writerow([i.title, i.price, i.orders, i.stock])
+
+    return response
