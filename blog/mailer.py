@@ -6,13 +6,18 @@ import time
 import codecs
 from email.utils import make_msgid
 from smtplib import SMTPException
+import environ
+env = environ.Env()
+environ.Env.read_env()
+
+SECRET_KEY = env("SECRET_KEY")
 
 def sendDaMail(towho, name, product, quantity):
 
     print('SENDING DA MAIL '+towho)
 
     email_sender = 'sahil7503@gmail.com'
-    email_password = ''
+    email_password = env("EMAIL_PASS")
 
     email_reciver = towho
 
