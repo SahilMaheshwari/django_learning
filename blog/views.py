@@ -38,6 +38,12 @@ class PostListView(ListView):
     context_object_name = 'posts'
     ordering = ['-orders']
 
+    def as_seller(self, request):
+        if request.user.profile.is_seller:
+            self.template_name = 'blog/sellerhome.html'
+        return self.as_view()
+
+
 class PostDetailView(DetailView):
     model = post
 
@@ -112,7 +118,7 @@ def placeorder(request):
                         products.product.stock -= products.quantity
                         products.product.orders += products.quantity
                         products.product.save()
-                        sendDaMail(products.product.author.email, products.product.author.username)
+                        sendDaMail(products.product.author.email, products.product.author.username, products.product.title, products.quantity)
 
                     return render(request, 'blog/orderplaced.html')
                 else:

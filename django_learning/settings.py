@@ -80,11 +80,14 @@ WSGI_APPLICATION = 'django_learning.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'dbtest', 
+        'USER': 'postgres',
+        'PASSWORD': 'sahil1234',
+        'HOST': '127.0.0.1', 
+        'PORT': '5433',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators

@@ -12,6 +12,14 @@ def register(request):
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             form.save()
+
+#            user = request.user
+#            profile = Profile.objects.filter(user=user).first()
+#            is_seller = form.cleaned_data.get('is_seller')
+#            cash = form.cleaned_data.get('cash')
+#            profile.user.profile.is_seller = is_seller
+#            profile.user.profile.cash = cash
+
             username = form.cleaned_data.get('username')
             messages.success(request, f'Account created for {username}!')
             return redirect('login')

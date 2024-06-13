@@ -5,24 +5,21 @@ import smtplib
 import time
 import codecs
 from email.utils import make_msgid
+from smtplib import SMTPException
 
-def sendDaMail(towho, name):
+def sendDaMail(towho, name, product, quantity):
 
     print('SENDING DA MAIL '+towho)
 
-    email_sender = ''     #email here
-    email_password = ''   #password here
+    email_sender = 'sahil7503@gmail.com'
+    email_password = ''
 
     email_reciver = towho
 
     subject = 'Order placed!'
-    body = """<html>
-<body>
-<p>Dear {name},</p>
-<p>An order has been placed :D.</p>
-</body>
-</html>
-    """.format(name)
+    body = f"""Dear {name},
+An order has been placed for {quantity} {product} 
+    """
 
     em = EmailMessage()
     em['From'] = email_sender
@@ -33,7 +30,10 @@ def sendDaMail(towho, name):
     context = ssl.create_default_context()
 
     with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
-        smtp.login(email_sender, email_password)
-        smtp.sendmail(email_sender, email_reciver, em.as_string())
+        try:
+            smtp.login(email_sender, email_password)
+            smtp.sendmail(email_sender, email_reciver, em.as_string())
+        except SMTPException as e:
+            print(f"mail wasnt sent to {name} because ")
 
     print('DONE')
