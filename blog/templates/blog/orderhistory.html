@@ -1,24 +1,41 @@
 {% extends "blog/base.html" %}
+
 {% block content %}
-    {% for order in orders %}
-    <article class="media content-section">    
-    <h2><a class="article-title" href="#">order {{ forloop.counter }}</a></h2>
-    <br>
-        {% for post in order.cartitems_set.all %}
-        <article class="media content-section">
-        <img class="rounded-circle article-img" src="{{ post.product.author.profile.image.url }}">
-        <div class="media-body">
-            <div class="article-metadata">
-            <a class="mr-2" href="#">{{ post.product.author }}</a>
-            <small class="text-muted">{{ post.product.date_posted|date:"F d, Y" }}</small>
-            </div>
-            <h2><a class="article-title" href="{% url 'post-detail' post.product.id %}">{{ post.product.title }}</a></h2>
-            <p class="article-content">price of one ${{ post.product.price }}</p>
-            <p class="article-content">Quantity {{ post.quantity }}</p>
-            <img class="article-img" src="{{ post.product.image.url }}" alt="{{ post.product.title }}">
+    <div class="container">
+        <div class="row">
+            {% for order in orders %}
+                <div class="col-md-12 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title">
+                                <span class="order-number">Order {{ forloop.counter }}</span> 
+                                <span class="order-date">Placed on {{ order.date_placed|date:"F d, Y" }}</span>
+                            </h2>   
+                                                     
+                            <hr>
+                            {% for post in order.cartitems_set.all %}
+                                <div class="media">
+                                    <img class="mr-3 rounded-circle article-img" src="{{ post.product.author.profile.image.url }}" alt="{{ post.product.author }}">
+                                    <div class="media-body">
+                                        <div class="article-metadata mb-2">
+                                            <a href="#">{{ post.product.author }}</a>
+                                            <span class="text-muted ml-2">{{ post.product.date_posted|date:"F d, Y" }}</span>
+                                        </div>
+                                        <h4 class="article-title"><a href="{% url 'post-detail' post.product.id %}">{{ post.product.title }}</a></h4>
+                                        <p class="article-content">Price: ${{ post.product.price }}</p>
+                                        <p class="article-content">Quantity: {{ post.quantity }}</p>
+                                        <img src="{{ post.product.image.url }}" class="article-img" alt="{{ post.product.title }}">
+                                        <a href="{% url 'review' post.product.id%}" class="btn btn-primary mt-3">Add Review</a>
+                                    </div>
+                                </div>
+                                {% if not forloop.last %}
+                                    <hr>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
-        </article>
-        {% endfor %}
-    </article>
-    {% endfor %}
+    </div>
 {% endblock content %}

@@ -1,16 +1,19 @@
 from django.forms.models import BaseModelForm
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import post, Cart, CartItems
+from .models import post, Cart, CartItems, Review
 from django.views.generic import ListView, DetailView, CreateView
 from django.shortcuts import redirect   
 from django.http import HttpResponseRedirect
-#from .forms import UserAddMoney
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from registration.models import Profile
 from .mailer import sendDaMail
 import csv
+from .forms import UserReview
+from django.urls import reverse_lazy
+from django.utils import timezone
+
 
 
 # def home(request):
@@ -110,6 +113,7 @@ def placeorder(request):
             if stockenough :
                 if profile.cash > cart.total_price():
                     cart.is_paid = True
+                    cart.date_placed = timezone.now()
                     cart.save()
                     profile.cash = profile.cash - cart.total_price()
                     profile.save()
@@ -118,7 +122,7 @@ def placeorder(request):
                         products.product.stock -= products.quantity
                         products.product.orders += products.quantity
                         products.product.save()
-                        sendDaMail(products.product.author.email, products.product.author.username, products.product.title, products.quantity)
+                        #sendDaMail(products.product.author.email, products.product.author.username, products.product.title, products.quantity)
 
                     return render(request, 'blog/orderplaced.html')
                 else:
@@ -157,3 +161,18 @@ def generate_report(request):
         writer.writerow([i.title, i.price, i.orders, i.stock])
 
     return response
+
+class review(CreateView):
+    model = Review
+    form_class = UserReview
+    template_name = 'blog/review.html'
+
+    def get_success_url(self):
+        # Redirect to the detail view of the associated Post
+        return reverse_lazy('post-detail', kwargs={'pk': self.object.product.pk})
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        form.instance.product_id = self.kwargs['pk']
+        return super().form_valid(form)
+
