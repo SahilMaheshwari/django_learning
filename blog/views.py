@@ -41,10 +41,10 @@ class PostListView(ListView):
     context_object_name = 'posts'
     ordering = ['-orders']
 
-    def as_seller(self, request):
-        if request.user.profile.is_seller:
-            self.template_name = 'blog/sellerhome.html'
-        return self.as_view()
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and request.user.profile.is_seller:
+            return redirect('sellerhome')
+        return super().dispatch(request, *args, **kwargs)
 
 
 class PostDetailView(DetailView):
@@ -53,6 +53,11 @@ class PostDetailView(DetailView):
 class PostCreateView(CreateView):
     model = post
     fields = ['title', 'price', 'image', 'description', 'stock']
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and not request.user.profile.is_seller:
+            sellerhome(request)
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -86,6 +91,8 @@ def add_to_cart(request, id):
 
 @login_required
 def cart(request):
+    if request.user.profile.is_seller:
+        return render(request, 'blog/sellerhome.html')
     cart, created = Cart.objects.get_or_create(user = request.user, is_paid = False)
     cart_items = cart.cartitems_set.all()
     products = [i.product for i in cart_items]
@@ -100,6 +107,9 @@ def cart(request):
 
 @login_required
 def placeorder(request):
+    if request.user.profile.is_seller:
+        return render(request, 'blog/sellerhome.html')
+    
     if request.method == 'POST':
         user = request.user
         cart = Cart.objects.filter(is_paid=False, user=user).first()
@@ -144,6 +154,8 @@ def sellerhome(request):
 
 @login_required
 def orderhistory(request):
+    if request.user.profile.is_seller:
+        return render(request, 'blog/sellerhome.html')
     user = request.user
     orders = Cart.objects.filter(is_paid=True, user=user).order_by('-id')
 
@@ -180,6 +192,10 @@ class review(CreateView):
 
 @login_required
 def wishlist(request):
+
+    if request.user.profile.is_seller:
+        return render(request, 'blog/sellerhome.html')
+
     wish, created = WishList.objects.get_or_create(user = request.user)
     wish_items = wish.wishlistitems_set.all()
     products = [i.product for i in wish_items]
