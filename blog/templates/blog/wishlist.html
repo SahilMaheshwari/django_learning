@@ -1,0 +1,33 @@
+{%extends "blog/base.html"%}
+{% block content %}
+    {% for post in wish_items %}
+        <article class="media content-section">
+        <img class="rounded-circle article-img" src="{{ post.product.author.profile.image.url }}">
+        <div class="media-body">
+            <div class="article-metadata">
+            <a class="mr-2" href="#">{{ post.product.author }}</a>
+            <a class="mr-2" href="#">{{ post.product.id }}</a>
+            <small class="text-muted">{{ post.product.date_posted|date:"F d, Y" }}</small>
+            </div>
+                <h2><a class="article-title" href="{% url 'post-detail' post.product.id %}">{{ post.product.title }}</a></h2>
+                <p class="article-content">price of one ${{ post.product.price }}</p>
+                <img class="article-img" src="{{ post.product.image.url }}" alt="{{ post.product.title }}">
+                <form method="post" action="{% url 'add_to_cart' post.product.id %}">
+                    {% csrf_token %}
+                    <label for="quantity">Quantity:</label>
+                    <select name="quantity" id="quantity">
+                        {% for qty in '123456789'|make_list %}
+                            <option value="{{ qty }}">{{ qty }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary">Add to cart</button>
+                </form>
+            </div>
+        </article>
+    {% endfor %}
+    <h2><a class="article-title" href="">Total price = {{ wish.total_price }}</a></h2>
+    <form method="post" action="{% url 'orderplaced' %}">
+        {% csrf_token %}
+        <button type="submit">Place Order</button>
+    </form>
+{% endblock content %}

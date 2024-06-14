@@ -93,3 +93,9 @@ body {
       font-size: 1rem;
       color: #666;
   }
+
+  .heart-icon {
+      color: red; /* Change color as desired */
+      font-size: 20px; /* Adjust size */
+      margin-left: 10px; /* Add margin for spacing */
+  }

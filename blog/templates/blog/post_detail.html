@@ -15,13 +15,24 @@
       </div>
       <h2 class="article-title">{{ object.title }}</h2>
       <p class="article-content">{{ object.price }}</p>
-      <img src="{{ object.image.url }}" style="max-height:300px">  
+      <img src="{{ object.image.url }}" style="max-height:300px">
+      <h3 class="article-title">Add to cart</h3>  
+      <form method="post" action="{% url 'add_to_cart' post.id %}">
+        {% csrf_token %}
+        <label for="quantity">Quantity:</label>
+        <select name="quantity" id="quantity">
+            {% for qty in '123456789'|make_list %}
+                <option value="{{ qty }}">{{ qty }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary">Add to cart</button>
+    </form>
     </div>
   </article>
 
   <h2>Reviews</h2>
   {% if not object.review.all %}
-    No comments yet...
+    No Reviews yet...
   {% else %}
     {% for review in object.review.all %}
     <article class="media content-section">
@@ -33,6 +44,7 @@
         </div>
         <h2 class="article-title">{{ review.title }}</h2>
         <p class="article-content">{{ review.content }}</p>
+        <p class="article-content">rating {{ review.rating }}/10</p>
       </div>
     </article>
     {% endfor %}

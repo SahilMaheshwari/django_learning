@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.urls import reverse
 from registration.models import User
+from django.core.validators import MaxValueValidator, MinValueValidator 
 
 class post(models.Model):
     title = models.CharField(max_length=100)
@@ -35,29 +36,27 @@ class CartItems(models.Model):
     product = models.ForeignKey(post, on_delete=models.SET_NULL, null=True, blank=True)
     quantity = models.IntegerField(default=0)
 
-class Wishlist(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    is_paid = models.BooleanField(default=False)
-    date_placed = models.DateField(default=timezone.now)
-
-    def total_price(self):
-        Wishlist_items = self.Wishlistitems_set.all()
-        WishlistPrice = sum(i.product.price*i.quantity for i in Wishlist_items)
-        return WishlistPrice
-
-class WishlistItems(models.Model):
-    Wishlist = models.ForeignKey(Wishlist, on_delete=models.CASCADE)
-    product = models.ForeignKey(post, on_delete=models.SET_NULL, null=True, blank=True)
-    quantity = models.IntegerField(default=0)
-
 class Review(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(post, on_delete=models.CASCADE, related_name="review")
     title = models.CharField(max_length=40, default='Review')
     content = models.CharField(max_length=200, default='No description given')
-    rating = models.PositiveIntegerField(default=1)
+    rating = models.PositiveIntegerField(default=1,validators=[MinValueValidator(1), MaxValueValidator(10)])
     date = models.DateField(default=timezone.now)
 
     def __str__(self):
         return '%s - %s' %(self.product.title, self.author)
+    
+class WishList(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date_placed = models.DateField(default=timezone.now)
+
+    def total_price(self):
+        Wishlist_items = self.wishlistitems_set.all()
+        WishlistPrice = sum(i.product.price for i in Wishlist_items)
+        return WishlistPrice
+
+class WishlistItems(models.Model):
+    wishlist = models.ForeignKey(WishList, on_delete=models.CASCADE)
+    product = models.ForeignKey(post, on_delete=models.SET_NULL, null=True, blank=True)
     

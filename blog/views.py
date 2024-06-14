@@ -1,7 +1,7 @@
 from django.forms.models import BaseModelForm
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import post, Cart, CartItems, Review
+from .models import post, Cart, CartItems, Review, WishList, WishlistItems
 from django.views.generic import ListView, DetailView, CreateView
 from django.shortcuts import redirect   
 from django.http import HttpResponseRedirect
@@ -71,13 +71,15 @@ def add_to_cart(request, id):
     else:
         print("Existing cart found for the user")
 
+    
     cart_item, created = CartItems.objects.get_or_create(cart=cart, product=product)
+    qty = int(request.POST.get('quantity', 1))
     if created:
-        cart_item.quantity = 1
+        cart_item.quantity = qty
         cart_item.save()
         print(f"Added {product} to cart {cart}")
     else:
-        cart_item.quantity += 1
+        cart_item.quantity += qty
         cart_item.save()
         print(f"Updated {product} quantity in cart {cart}")
     return HttpResponseRedirect('/')
@@ -176,3 +178,32 @@ class review(CreateView):
         form.instance.product_id = self.kwargs['pk']
         return super().form_valid(form)
 
+@login_required
+def wishlist(request):
+    wish, created = WishList.objects.get_or_create(user = request.user)
+    wish_items = wish.wishlistitems_set.all()
+    products = [i.product for i in wish_items]
+
+    context = {
+        'wish': wish,
+        'wish_items': wish_items,  # Use the related_name 'items'
+        'products': products
+    }
+
+    return render(request, 'blog/wishlist.html', context)
+
+@login_required
+def add_to_wishlist(request, id):
+    product = post.objects.get(id=id)
+    user = request.user
+    wish, created = WishList.objects.get_or_create(user = user)
+    if created:
+        print("Created a new WishList for the user")
+    else:
+        print("Existing WishList found for the user")
+
+    wish_item, created = WishlistItems.objects.get_or_create(wishlist=wish, product=product)
+    wish_item.save()
+    print(f"Added {product} to WishList {wish}")
+
+    return HttpResponseRedirect('/')
