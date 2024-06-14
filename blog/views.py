@@ -67,7 +67,7 @@ def about(request):
     return render(request, 'blog/about.html', {'title' : 'About'})
 
 @login_required
-def add_to_cart(request, id):
+def add_to_cart(request, id, source):
     product = post.objects.get(id=id)
     user = request.user
     cart, created = Cart.objects.get_or_create(user = user, is_paid = False)
@@ -87,6 +87,12 @@ def add_to_cart(request, id):
         cart_item.quantity += qty
         cart_item.save()
         print(f"Updated {product} quantity in cart {cart}")
+
+    if source == 'wishlist':
+        wishlist = WishList.objects.filter(user=user).first()
+        wishlistitem = WishlistItems.objects.filter(wishlist=wishlist, product=product).first()
+        wishlistitem.delete()
+
     return HttpResponseRedirect('/')
 
 @login_required

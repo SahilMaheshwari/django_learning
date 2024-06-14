@@ -15,7 +15,7 @@
             <img class="article-img" src="{{ post.image.url }}" alt="{{ post.title }}">
             <p class="article-content">Description: {{ post.description }}</p>
                 <!-- Dropdown select for quantity -->
-                <form method="post" action="{% url 'add_to_cart' post.id %}">
+                <form method="post" action="{% url 'add_to_cart' post.id 'home' %}">
                   {% csrf_token %}
                   <label for="quantity">Quantity:</label>
                   <select name="quantity" id="quantity">

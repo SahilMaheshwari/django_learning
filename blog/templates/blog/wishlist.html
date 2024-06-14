@@ -12,7 +12,7 @@
                 <h2><a class="article-title" href="{% url 'post-detail' post.product.id %}">{{ post.product.title }}</a></h2>
                 <p class="article-content">price of one ${{ post.product.price }}</p>
                 <img class="article-img" src="{{ post.product.image.url }}" alt="{{ post.product.title }}">
-                <form method="post" action="{% url 'add_to_cart' post.product.id %}">
+                <form method="post" action="{% url 'add_to_cart' post.product.id 'wishlist'%}">
                     {% csrf_token %}
                     <label for="quantity">Quantity:</label>
                     <select name="quantity" id="quantity">
