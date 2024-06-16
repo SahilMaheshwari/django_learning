@@ -1,6 +1,6 @@
 from django.db import models  
 from django.forms import fields  
-from .models import post, Review  
+from .models import post, Review, DiscountCodes
 from django import forms  
 from django.contrib.auth.forms import UserCreationForm
 from registration.models import Profile
@@ -23,3 +23,8 @@ class UserReview(forms.ModelForm):
     class Meta:
         model = Review
         fields = ['title', 'content', 'rating']
+
+class AddDiscountCode( forms.ModelForm ):
+    class Meta:
+        model = DiscountCodes
+        fields = ['title', 'discount']

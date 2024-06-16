@@ -6,7 +6,6 @@
         <div class="media-body">
             <div class="article-metadata">
             <a class="mr-2" href="#">{{ post.product.author }}</a>
-            <a class="mr-2" href="#">{{ post.product.id }}</a>
             <small class="text-muted">{{ post.product.date_posted|date:"F d, Y" }}</small>
             </div>
                 <h2><a class="article-title" href="{% url 'post-detail' post.product.id %}">{{ post.product.title }}</a></h2>

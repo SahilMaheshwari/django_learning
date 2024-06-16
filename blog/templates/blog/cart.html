@@ -1,24 +1,49 @@
-{%extends "blog/base.html"%}
+{% extends "blog/base.html" %}
+
 {% block content %}
-    {% for post in cart_items %}
+<div class="row">
+    <div class="col-md-8">
+        {% for post in cart_items %}
         <article class="media content-section">
-        <img class="rounded-circle article-img" src="{{ post.product.author.profile.image.url }}">
-        <div class="media-body">
-            <div class="article-metadata">
-            <a class="mr-2" href="#">{{ post.product.author }}</a>
-            <a class="mr-2" href="#">{{ post.product.id }}</a>
-            <small class="text-muted">{{ post.product.date_posted|date:"F d, Y" }}</small>
+            <img class="rounded-circle article-img" src="{{ post.product.author.profile.image.url }}">
+            <div class="media-body">
+                <div class="article-metadata">
+                    <a class="mr-2" href="#">{{ post.product.author }}</a>
+                    <small class="text-muted">{{ post.product.date_posted|date:"F d, Y" }}</small>
+                </div>
+                <h2><a class="article-title" href="{% url 'post-detail' post.product.id %}">{{ post.product.title }}</a></h2>
+                {% with is_discounted=post.product.is_discounted %}
+                    {% if is_discounted.0 %}
+                        <span style="text-decoration: line-through;">${{ post.product.price }}</span>
+                        <p class="article-content" style="color: red;">Discounted price: ${{ is_discounted.1|floatformat:2 }}</p>
+                    {% else %}
+                        <p class="article-content">${{ post.product.price }}</p>
+                    {% endif %}
+                {% endwith %}
+                <p class="article-content">Quantity: {{ post.quantity }}</p>
+                <img class="article-img" src="{{ post.product.image.url }}" alt="{{ post.product.title }}">
             </div>
-            <h2><a class="article-title" href="{% url 'post-detail' post.product.id %}">{{ post.product.title }}</a></h2>
-            <p class="article-content">price of one ${{ post.product.price }}</p>
-            <p class="article-content">Quantity {{ post.quantity }}</p>
-            <img class="article-img" src="{{ post.product.image.url }}" alt="{{ post.product.title }}">
-        </div>
         </article>
-    {% endfor %}
-    <h2><a class="article-title" href="">Total price = {{ cart.total_price }}</a></h2>
-    <form method="post" action="{% url 'orderplaced' %}">
-        {% csrf_token %}
-        <button type="submit">Place Order</button>
-    </form>
+        {% endfor %}
+        <h2>Total price: ${{ cart.total_price|floatformat:2 }}</h2>
+        <h3>Price saved: ${{ cart.price_saved|floatformat:2 }}</h3>
+        <form method="post" action="{% url 'orderplaced' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Place Order</button>
+        </form>
+    </div>
+    <div class="col-md-4">
+        <div class="discount-code-section">
+            <h2>Apply Discount Code</h2>
+            <form method="post" action="#">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="discount_code">Discount Code:</label>
+                    <input type="text" id="discount_code" name="discount_code" class="form-control" placeholder="Enter your code">
+                </div>
+                <button type="submit" class="btn btn-primary">Apply</button>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock content %}

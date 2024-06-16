@@ -17,7 +17,7 @@ def sendDaMail(towho, name, product, quantity):
     print('SENDING DA MAIL '+towho)
 
     email_sender = 'sahil7503@gmail.com'
-    email_password = env("EMAIL_PASS")
+    email_password = ''
 
     email_reciver = towho
 
@@ -39,6 +39,6 @@ An order has been placed for {quantity} {product}
             smtp.login(email_sender, email_password)
             smtp.sendmail(email_sender, email_reciver, em.as_string())
         except SMTPException as e:
-            print(f"mail wasnt sent to {name} because ")
+            print(f"mail wasnt sent to {name} because {e}")
 
     print('DONE')

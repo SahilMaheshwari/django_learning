@@ -8,7 +8,7 @@
         <small class="text-muted">{{ object.date_posted|date:"F d, Y" }}</small>
         {% if object.author == user %}
           <div>
-            <a class="btn btn-secondary btn-sm mt-1 mb-1" href="#">Update</a>
+            <a class="btn btn-secondary btn-sm mt-1 mb-1" href="post_update">Update</a>
             <a class="btn btn-danger btn-sm mt-1 mb-1" href="#">Delete</a>
           </div>
         {% endif %}
@@ -17,7 +17,7 @@
       <p class="article-content">$ {{ object.price }}</p>
       <img src="{{ object.image.url }}" style="max-height:300px">
       <h3 class="article-title">Add to cart</h3>  
-      <form method="post" action="{% url 'add_to_cart' post.id %}">
+      <form method="post" action="{% url 'add_to_cart' post.id 'detail_view'%}">
         {% csrf_token %}
         <label for="quantity">Quantity:</label>
         <select name="quantity" id="quantity">
@@ -27,6 +27,7 @@
         </select>
         <button type="submit" class="btn btn-primary">Add to cart</button>
     </form>
+    <a href="{% url 'add_to_wishlist' post.id %}" class="heart-icon"><i class="fa fa-heart"></i></a>
     </div>
   </article>
 
@@ -49,6 +50,5 @@
     </article>
     {% endfor %}
   {% endif %}
-
 
 {% endblock content %}

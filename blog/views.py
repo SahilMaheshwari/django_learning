@@ -1,18 +1,21 @@
 from django.forms.models import BaseModelForm
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import post, Cart, CartItems, Review, WishList, WishlistItems
-from django.views.generic import ListView, DetailView, CreateView
-from django.shortcuts import redirect   
+from .models import post, Cart, CartItems, Review, WishList, WishlistItems, DiscountCodes
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.shortcuts import redirect, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from registration.models import Profile
 from .mailer import sendDaMail
 import csv
-from .forms import UserReview
+from .forms import UserReview, AddDiscountCode
 from django.urls import reverse_lazy
 from django.utils import timezone
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
+
 
 
 
@@ -46,13 +49,25 @@ class PostListView(ListView):
             return redirect('sellerhome')
         return super().dispatch(request, *args, **kwargs)
 
-
 class PostDetailView(DetailView):
     model = post
 
-class PostCreateView(CreateView):
+class PostCreateView(LoginRequiredMixin, CreateView):
     model = post
     fields = ['title', 'price', 'image', 'description', 'stock']
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and not request.user.profile.is_seller:
+            sellerhome(request)
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+class PostUpdateView(LoginRequiredMixin, UpdateView):
+    model = post
+    fields = ['title', 'price', 'image', 'description', 'stock', 'discount']
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated and not request.user.profile.is_seller:
@@ -105,7 +120,7 @@ def cart(request):
 
     context = {
         'cart': cart,
-        'cart_items': cart_items,  # Use the related_name 'items'
+        'cart_items': cart_items,
         'products': products
     }
 
@@ -140,8 +155,10 @@ def placeorder(request):
                         products.product.stock -= products.quantity
                         products.product.orders += products.quantity
                         products.product.save()
-                        #sendDaMail(products.product.author.email, products.product.author.username, products.product.title, products.quantity)
-
+                        try:
+                            sendDaMail(products.product.author.email, products.product.author.username, products.product.title, products.quantity)
+                        except:
+                            print("mail wasnt sent")
                     return render(request, 'blog/orderplaced.html')
                 else:
                     return render(request, 'blog/sorry.html', {'sorrytext' : "Not enough money in account"})
@@ -149,9 +166,9 @@ def placeorder(request):
                 cart.delete()
                 return render(request, 'blog/sorry.html', {'sorrytext' : "Sorry, please order quantity in stock"})
         else:
-            return redirect('cart')  # If no cart found, redirect to the cart page
+            return redirect('cart')
 
-    return redirect('cart')  # Redirect to cart if the request method is not POST
+    return redirect('cart')
 
 @login_required
 def sellerhome(request):
@@ -188,7 +205,6 @@ class review(CreateView):
     template_name = 'blog/review.html'
 
     def get_success_url(self):
-        # Redirect to the detail view of the associated Post
         return reverse_lazy('post-detail', kwargs={'pk': self.object.product.pk})
 
     def form_valid(self, form):
@@ -208,7 +224,7 @@ def wishlist(request):
 
     context = {
         'wish': wish,
-        'wish_items': wish_items,  # Use the related_name 'items'
+        'wish_items': wish_items,
         'products': products
     }
 
@@ -229,3 +245,56 @@ def add_to_wishlist(request, id):
     print(f"Added {product} to WishList {wish}")
 
     return HttpResponseRedirect('/')
+
+class DiscountListView(ListView):
+    model = DiscountCodes
+    template_name = 'blog/discountcodes.html'
+    context_object_name = 'codes'
+    ordering = ['-id']
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and not request.user.profile.is_seller:
+            return redirect('home')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_queryset(self):
+        user = self.request.user
+        return DiscountCodes.objects.filter(author=user)
+
+@login_required    
+def delete_discount_code(request, id):
+    code = get_object_or_404(DiscountCodes, id=id, author=request.user)
+    code.delete()
+    return redirect('discountcodes')  
+
+class AddCode(CreateView):
+    model = DiscountCodes
+    form_class = AddDiscountCode
+    template_name = 'blog/adddiscountcode.html'
+
+    def get_success_url(self):
+        return reverse_lazy('discountcodes')
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+    
+class SellerListView(ListView):
+    model = Profile
+    template_name = 'blog/sellers.html'
+    context_object_name = 'sellers'
+    ordering = ['-id']
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and request.user.profile.is_seller:
+            return redirect('sellerhome')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_queryset(self):
+        return Profile.objects.filter(is_seller=True)
+    
+@login_required
+def seller(request, vendor):
+    author = User.objects.filter(username = vendor).first()
+    posts = post.objects.filter(author = author.id)
+    return render(request, 'blog/seller.html', {'posts' : posts})

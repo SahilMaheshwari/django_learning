@@ -6,11 +6,16 @@
           <img class="rounded-circle article-img" src="{{ post.author.profile.image.url }}">
           <div class="media-body">
             <div class="article-metadata">
-              <a class="mr-2" href="#">{{ post.author }}</a>
+              <a class="mr-2" href="{% url 'seller' post.author %}">{{ post.author }}</a>
               <small class="text-muted">{{ post.date_posted|date:"F d, Y" }}</small>
             </div>
             <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
+            {% if post.is_discounted.0 != 0 %}
+            <span style="text-decoration: line-through;">${{ post.price }}</span>
+            <p class="article-content" style="color: red;">discounted price ${{ post.is_discounted.1 }}</p>      
+            {% else %}
             <p class="article-content">${{ post.price }}</p>
+            {% endif %}
             <p class="article-content">Stock: {{ post.stock }}</p>
             <img class="article-img" src="{{ post.image.url }}" alt="{{ post.title }}">
             <p class="article-content">Description: {{ post.description }}</p>

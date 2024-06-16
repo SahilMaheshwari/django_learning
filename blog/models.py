@@ -14,12 +14,19 @@ class post(models.Model):
     orders = models.IntegerField(default=0)
     stock = models.IntegerField(default=0)
     description = models.CharField(max_length=200, default='No description given')
+    discount = models.PositiveIntegerField(default=0, validators=[MinValueValidator(1), MaxValueValidator(99)])
 
     def __str__(self):
         return self.title
 
     def get_absolute_url(self):
         return reverse('post-detail', kwargs={'pk' : self.pk})
+    
+    def is_discounted(self):
+        if self.discount != 0:
+            discountedprice = self.price * (100-self.discount) / 100
+            return (True, discountedprice)
+        return (False, self.price)
 
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -28,8 +35,27 @@ class Cart(models.Model):
 
     def total_price(self):
         cart_items = self.cartitems_set.all()
-        cartPrice = sum(i.product.price*i.quantity for i in cart_items)
+        cartPrice = 0
+        for i in cart_items:
+            is_discounted, discounted_price = i.product.is_discounted()
+            if is_discounted:
+                cartPrice += discounted_price*i.quantity
+            else:
+                cartPrice += i.product.price*i.quantity
         return cartPrice
+    
+    def price_saved(self):
+
+        if self.total_price() == 0:
+            return 0, 0
+
+        cart_items = self.cartitems_set.all()
+        original = sum(i.product.price*i.quantity for i in cart_items)
+        discounted = self.total_price()
+        saved = original - discounted
+        percent = 100*(saved/original)
+
+        return saved, percent
 
 class CartItems(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
@@ -60,3 +86,7 @@ class WishlistItems(models.Model):
     wishlist = models.ForeignKey(WishList, on_delete=models.CASCADE)
     product = models.ForeignKey(post, on_delete=models.SET_NULL, null=True, blank=True)
     
+class DiscountCodes(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(default='discount', max_length=8)
+    discount = models.PositiveIntegerField(default=0, validators=[MinValueValidator(1), MaxValueValidator(99)])

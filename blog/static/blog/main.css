@@ -99,3 +99,23 @@ body {
       font-size: 20px; /* Adjust size */
       margin-left: 10px; /* Add margin for spacing */
   }
+
+  .discount-code-section {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 20px;
+    background-color: #f9f9f9;
+}
+
+.discount-code-section h2 {
+    margin-bottom: 20px;
+}
+
+.discount-code-section .form-group {
+    margin-bottom: 15px;
+}
+
+.discount-code-section .btn-primary {
+    width: 100%;
+}
