@@ -47,6 +47,7 @@ class Cart(models.Model):
     def price_saved(self):
 
         if self.total_price() == 0:
+            print(0,0)
             return 0, 0
 
         cart_items = self.cartitems_set.all()
@@ -55,6 +56,7 @@ class Cart(models.Model):
         saved = original - discounted
         percent = 100*(saved/original)
 
+        print(saved, percent)
         return saved, percent
 
 class CartItems(models.Model):

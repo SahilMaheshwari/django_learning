@@ -26,7 +26,7 @@
         </article>
         {% endfor %}
         <h2>Total price: ${{ cart.total_price|floatformat:2 }}</h2>
-        <h3>Price saved: ${{ cart.price_saved|floatformat:2 }}</h3>
+        <h3><a class="article-title" href="">Your Savings  ${{ cart.price_saved.0 }} ({{cart.price_saved.1|floatformat:1}}%)</a></h3>
         <form method="post" action="{% url 'orderplaced' %}">
             {% csrf_token %}
             <button type="submit" class="btn btn-primary">Place Order</button>
