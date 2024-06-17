@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from blog.views import add_to_cart, cart, placeorder, sellerhome, generate_report, add_to_wishlist, wishlist, delete_discount_code, seller
+from blog.views import add_to_cart, cart, placeorder, sellerhome, generate_report, add_to_wishlist, wishlist, delete_discount_code, seller, coupon_applied
 from blog.views import PostListView, PostDetailView, PostCreateView, PostUpdateView, review, DiscountListView, AddCode, SellerListView
 
 urlpatterns = [
@@ -22,7 +22,6 @@ urlpatterns = [
     path('add-discount-code', AddCode.as_view() ,name='add_discount_code'),
     path('sellers/', SellerListView.as_view(), name='sellers'),
     path('seller/<str:vendor>', seller, name='seller'),
-    
-
+    path('coupon_applied/', coupon_applied, name='coupon_applied')
 ]
   

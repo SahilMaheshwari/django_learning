@@ -34,35 +34,37 @@ class Cart(models.Model):
     date_placed = models.DateField(default=timezone.now)
 
     def total_price(self):
+
         cart_items = self.cartitems_set.all()
-        cartPrice = 0
+        cartPrice = sum(i.product.price*i.quantity for i in cart_items)
+
+        discounted = 0
         for i in cart_items:
-            is_discounted, discounted_price = i.product.is_discounted()
-            if is_discounted:
-                cartPrice += discounted_price*i.quantity
-            else:
-                cartPrice += i.product.price*i.quantity
-        return cartPrice
+            discount = min(99, i.coupon_discount+i.product.discount)
+            discounted += i.product.price*i.quantity*(100-discount)/100
+            
+        return discounted
     
     def price_saved(self):
-
-        if self.total_price() == 0:
-            print(0,0)
-            return 0, 0
 
         cart_items = self.cartitems_set.all()
         original = sum(i.product.price*i.quantity for i in cart_items)
         discounted = self.total_price()
-        saved = original - discounted
-        percent = 100*(saved/original)
 
-        print(saved, percent)
+        saved = original - discounted
+        try:
+            percent = saved*100/original
+        except:
+            percent = 0
+
         return saved, percent
 
 class CartItems(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.ForeignKey(post, on_delete=models.SET_NULL, null=True, blank=True)
     quantity = models.IntegerField(default=0)
+    coupon_discount = models.IntegerField(default=0, validators=[MinValueValidator(1), MaxValueValidator(100)])
+
 
 class Review(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)

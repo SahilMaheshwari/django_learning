@@ -35,11 +35,20 @@
     <div class="col-md-4">
         <div class="discount-code-section">
             <h2>Apply Discount Code</h2>
-            <form method="post" action="#">
+            <form method="post" action="{% url 'coupon_applied' %}">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="discount_code">Discount Code:</label>
                     <input type="text" id="discount_code" name="discount_code" class="form-control" placeholder="Enter your code">
+                </div>
+                <div class="form-group">
+                    <label for="vendor">Choose Vendor:</label>
+                    <select id="vendor" name="vendor" class="form-control">
+                        <option value="">Select a vendor</option>
+                        {% for vendor in vendors %}
+                            <option value="{{ vendor.id }}">{{ vendor.user.username }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
                 <button type="submit" class="btn btn-primary">Apply</button>
             </form>

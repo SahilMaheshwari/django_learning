@@ -118,10 +118,15 @@ def cart(request):
     cart_items = cart.cartitems_set.all()
     products = [i.product for i in cart_items]
 
+    vendors = Profile.get_sellers()
+    vendorsincart = [i.author.id for i in products]
+    vendors = vendors.filter(user__id__in=vendorsincart)
+
     context = {
         'cart': cart,
         'cart_items': cart_items,
-        'products': products
+        'products': products,
+        'vendors': vendors
     }
 
     return render(request, 'blog/cart.html', context)
@@ -298,3 +303,30 @@ def seller(request, vendor):
     author = User.objects.filter(username = vendor).first()
     posts = post.objects.filter(author = author.id)
     return render(request, 'blog/seller.html', {'posts' : posts})
+
+@login_required
+def coupon_applied(request):
+    if request.method == 'POST':
+        discount_code = request.POST.get('discount_code')    
+        vendor = request.POST.get('vendor')
+
+        codes = DiscountCodes.objects.filter(author = vendor)
+        code_valid = codes.filter(title=discount_code).exists()
+        
+        if code_valid:
+                cart = Cart.objects.filter(user = request.user, is_paid = False).first()
+                cart_items = cart.cartitems_set.all()
+                discount_object = DiscountCodes.objects.filter(title = discount_code).first()
+
+                for i in cart_items:
+                    finaldisc = i.coupon_discount + discount_object.discount
+                    if finaldisc > 99:
+                        messages.error(request, "Discount limit reached")
+                    i.coupon_discount = finaldisc
+                    i.save()
+                cart.price_saved()
+                messages.success(request, "code applied")                        
+        else:
+            messages.error(request, "Invalid code")
+
+    return HttpResponseRedirect('/cart')
