@@ -12,7 +12,7 @@
                     <small class="text-muted">{{ post.product.date_posted|date:"F d, Y" }}</small>
                 </div>
                 <h2><a class="article-title" href="{% url 'post-detail' post.product.id %}">{{ post.product.title }}</a></h2>
-                {% with is_discounted=post.product.is_discounted %}
+                {% with is_discounted=post.net_discount %}
                     {% if is_discounted.0 %}
                         <span style="text-decoration: line-through;">${{ post.product.price }}</span>
                         <p class="article-content" style="color: red;">Discounted price: ${{ is_discounted.1|floatformat:2 }}</p>

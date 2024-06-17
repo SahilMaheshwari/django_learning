@@ -65,6 +65,15 @@ class CartItems(models.Model):
     quantity = models.IntegerField(default=0)
     coupon_discount = models.IntegerField(default=0, validators=[MinValueValidator(1), MaxValueValidator(100)])
 
+    def net_discount(self):
+        if self.coupon_discount != 0 or self.product.discount !=0:
+            discount = self.product.discount+self.coupon_discount
+            if discount > 99:
+                discount = 99
+            discountedprice = self.product.price * (100-(discount)) / 100
+            return (True, discountedprice)
+        return (False, self.product.price)
+
 
 class Review(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
