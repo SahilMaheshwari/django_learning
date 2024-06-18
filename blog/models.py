@@ -28,10 +28,17 @@ class post(models.Model):
             return (True, discountedprice)
         return (False, self.price)
 
+class DiscountCodes(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(default='discount', max_length=12)
+    discount = models.PositiveIntegerField(default=0, validators=[MinValueValidator(1), MaxValueValidator(99)])
+
+
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     is_paid = models.BooleanField(default=False)
     date_placed = models.DateField(default=timezone.now)
+    coupons = models.ManyToManyField(DiscountCodes, blank=True)
 
     def total_price(self):
 
@@ -58,6 +65,13 @@ class Cart(models.Model):
             percent = 0
 
         return saved, percent
+
+    def add_coupon(self, discount_code):
+        if not self.coupons.filter(title=discount_code.title, author = discount_code.author).exists():
+            self.coupons.add(discount_code)
+            return True
+        else:
+            return False
 
 class CartItems(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
@@ -99,7 +113,3 @@ class WishlistItems(models.Model):
     wishlist = models.ForeignKey(WishList, on_delete=models.CASCADE)
     product = models.ForeignKey(post, on_delete=models.SET_NULL, null=True, blank=True)
     
-class DiscountCodes(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(default='discount', max_length=8)
-    discount = models.PositiveIntegerField(default=0, validators=[MinValueValidator(1), MaxValueValidator(99)])

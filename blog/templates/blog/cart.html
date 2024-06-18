@@ -1,5 +1,5 @@
 {% extends "blog/base.html" %}
-
+{% load crispy_forms_tags %}
 {% block content %}
 <div class="row">
     <div class="col-md-8">
@@ -26,7 +26,7 @@
         </article>
         {% endfor %}
         <h2>Total price: ${{ cart.total_price|floatformat:2 }}</h2>
-        <h3><a class="article-title" href="">Your Savings  ${{ cart.price_saved.0 }} ({{cart.price_saved.1|floatformat:1}}%)</a></h3>
+        <h3><a class="article-title" href="">Your Savings  ${{ cart.price_saved.0 }} ({{ cart.price_saved.1|floatformat:1 }}%)</a></h3>
         <form method="post" action="{% url 'orderplaced' %}">
             {% csrf_token %}
             <button type="submit" class="btn btn-primary">Place Order</button>
@@ -35,7 +35,7 @@
     <div class="col-md-4">
         <div class="discount-code-section">
             <h2>Apply Discount Code</h2>
-            <form method="post" action="{% url 'coupon_applied' %}">
+            <form id="discount-form" method="post" action="{% url 'coupon_applied' %}">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="discount_code">Discount Code:</label>
@@ -55,4 +55,16 @@
         </div>
     </div>
 </div>
+
+<script>
+document.getElementById('discount-form').addEventListener('submit', function(event) {
+    var discountCode = document.getElementById('discount_code').value.trim();
+    var vendor = document.getElementById('vendor').value.trim();
+    if (!discountCode || !vendor) {
+        alert('Please enter a discount code and select a vendor.');
+        event.preventDefault();
+    }
+});
+</script>
 {% endblock content %}
+

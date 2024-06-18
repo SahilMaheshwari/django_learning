@@ -6,6 +6,8 @@ class Profile(models.Model):
     image = models.ImageField(default='default.jpg', upload_to='profile_pics')
     is_seller = models.BooleanField(default=False)
     cash = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    # latitude = models.DecimalField(default=28.658555)
+    # longitude = models.DecimalField(default=77.189418)
 
     def __str__(self):
         return f'{self.user.username} Profile'

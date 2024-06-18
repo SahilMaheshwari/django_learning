@@ -312,21 +312,31 @@ def coupon_applied(request):
 
         codes = DiscountCodes.objects.filter(author = vendor)
         code_valid = codes.filter(title=discount_code).exists()
-        
-        if code_valid:
-                cart = Cart.objects.filter(user = request.user, is_paid = False).first()
-                cart_items = cart.cartitems_set.all()
-                discount_object = DiscountCodes.objects.filter(title = discount_code).first()
 
-                for i in cart_items:
-                    finaldisc = i.coupon_discount + discount_object.discount
-                    if finaldisc > 99:
-                        messages.error(request, "Discount limit reached")
-                    i.coupon_discount = finaldisc
-                    i.save()
-                cart.price_saved()
-                messages.success(request, "code applied")                        
-        else:
-            messages.error(request, "Invalid code")
+        if not code_valid:
+            messages.error(request, f'Invalid code')
+            return HttpResponseRedirect('/cart')
+
+        cart = Cart.objects.filter(user = request.user, is_paid = False).first()
+        discount_code_object = DiscountCodes.objects.filter(title = discount_code, author = vendor).first()
+        codeexist = cart.add_coupon(discount_code_object)
+
+        if not codeexist:
+            messages.error(request, f'code applied already')
+            return HttpResponseRedirect('/cart')
+                
+        cart = Cart.objects.filter(user = request.user, is_paid = False).first()
+        cart_items = cart.cartitems_set.all()
+        discount_object = DiscountCodes.objects.filter(title = discount_code).first()
+
+        for i in cart_items:
+            finaldisc = i.coupon_discount + discount_object.discount
+            if finaldisc > 99:
+                messages.error(request, "Discount limit reached")
+            i.coupon_discount = finaldisc
+            i.save()
+        cart.price_saved()
+        messages.success(request, "code applied")                        
+
 
     return HttpResponseRedirect('/cart')

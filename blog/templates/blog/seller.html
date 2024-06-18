@@ -1,5 +1,10 @@
 {% extends "blog/base.html" %}
 {% block content %}
+
+{% if posts|length == 0 %}
+<p class="article-content" style="color: red;">No listings yet</p>      
+{% endif %}
+
 {% for post in posts %}
 <article class="media content-section">
   <img class="rounded-circle article-img" src="{{ post.author.profile.image.url }}">

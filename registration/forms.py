@@ -7,10 +7,11 @@ class UserRegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
     is_seller = forms.BooleanField(required=False)
     cash = forms.DecimalField(max_digits=10, decimal_places=2)
+    image = forms.ImageField(required=False)
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password1', 'password2', 'is_seller', 'cash']
+        fields = ['username', 'email', 'password1', 'password2','image', 'is_seller', 'cash']
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:

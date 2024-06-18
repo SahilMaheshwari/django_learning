@@ -11,14 +11,17 @@ def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
 
-#            user = request.user
-#            profile = Profile.objects.filter(user=user).first()
-#            is_seller = form.cleaned_data.get('is_seller')
-#            cash = form.cleaned_data.get('cash')
-#            profile.user.profile.is_seller = is_seller
-#            profile.user.profile.cash = cash
+            is_seller = form.cleaned_data.get('is_seller')
+            cash = form.cleaned_data.get('cash')
+            image = form.cleaned_data.get('image')
+            userprofile = Profile.objects.filter(user=user).first()
+
+            userprofile.is_seller = is_seller
+            userprofile.cash = cash
+            userprofile.image = image if image else 'default.jpg'
+            userprofile.save()
 
             username = form.cleaned_data.get('username')
             messages.success(request, f'Account created for {username}!')
