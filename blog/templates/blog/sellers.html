@@ -5,6 +5,7 @@
 <article class="media content-section">
   <img class="rounded-circle article-img" src="{{ seller.image.url }}">
   <a class="mr-2" href="{% url 'seller' seller.user %}">{{ seller.user }}</a>
+  <a class="mr-2">{{ seller.listings_count }} listings</a>  
 </article>
 {% endfor %}
 {% endblock content %}

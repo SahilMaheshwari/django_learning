@@ -298,6 +298,13 @@ class SellerListView(ListView):
     def get_queryset(self):
         return Profile.objects.filter(is_seller=True)
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        sellers = context['sellers']
+        for seller in sellers:
+            seller.listings_count = post.objects.filter(author=seller.user).count()
+        return context
+    
 @login_required
 def seller(request, vendor):
     author = User.objects.filter(username = vendor).first()
