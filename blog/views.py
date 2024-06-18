@@ -160,10 +160,10 @@ def placeorder(request):
                         products.product.stock -= products.quantity
                         products.product.orders += products.quantity
                         products.product.save()
-                        # try:
-                        #     sendDaMail(products.product.author.email, products.product.author.username, products.product.title, products.quantity)
-                        # except:
-                        #     print("mail wasnt sent")
+                        try:
+                            sendDaMail(products.product.author.email, products.product.author.username, products.product.title, products.quantity)
+                        except:
+                            print("mail wasnt sent")
                     return render(request, 'blog/orderplaced.html')
                 else:
                     return render(request, 'blog/sorry.html', {'sorrytext' : "Not enough money in account"})
