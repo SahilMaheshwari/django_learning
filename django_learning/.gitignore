@@ -4,4 +4,4 @@ db.sqlite3
 /env
 *.env
 .vscode
-.django_venv
+django_venv/
