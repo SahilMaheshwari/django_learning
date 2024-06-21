@@ -7,9 +7,9 @@ import codecs
 from email.utils import make_msgid
 from smtplib import SMTPException
 
-import environ
-env = environ.Env()
-environ.Env.read_env()
+# import environ
+# env = environ.Env()
+# environ.Env.read_env()
 
 #password = env("EMAIL_PASS")
 password = os.environ.get("EMAIL_PASS")
