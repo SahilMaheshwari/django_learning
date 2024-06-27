@@ -1,8 +1,14 @@
 # pull official base image
 FROM python:3.11.4-slim-buster
 
-# set work directory
-WORKDIR /usr/src/django_learning
+
+# create the appropriate directories
+ENV HOME=/django-on-docker/django_learning
+ENV APP_HOME=/django-on-docker/django_learning/web
+RUN mkdir -p $APP_HOME
+RUN mkdir -p $APP_HOME/staticfiles
+RUN mkdir -p $APP_HOME/mediafiles
+WORKDIR $APP_HOME
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
